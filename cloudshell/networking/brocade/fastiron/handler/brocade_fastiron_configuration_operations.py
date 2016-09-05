@@ -57,16 +57,7 @@ class BrocadeFastIronConfigurationOperations(BrocadeConfigurationOperations):
         output = self.cli_service.send_command(command=save_command,
                                                expected_str=self._default_prompt)
 
-        retries = 1
-        while not re.search(r"[Dd]one|[Ee]rror|[Ff]ailed", output, re.DOTALL):
-            if retries > self._save_response_retries:
-                raise Exception(self.__class__.__name__, "Save configuration failed with error: TFTP session timeout")
-
-            time.sleep(self._save_response_timeout)
-            output += self.cli_service.send_command(command="", expected_str=self._default_prompt)
-            retries += 1
-
-        output += self.cli_service.send_command(command="", expected_str=self._default_prompt)
+        output = self._buffer_readup(output=output)
 
         if re.search(r"[Dd]one", output, re.DOTALL):
             return "{0}".format(file_path)
@@ -138,21 +129,12 @@ class BrocadeFastIronConfigurationOperations(BrocadeConfigurationOperations):
         output = self.cli_service.send_command(command=restore_command,
                                                expected_str=self._default_prompt)
 
-        retries = 1
-        while not re.search(r"[Dd]one|[Ee]rror|[Ff]ailed", output, re.DOTALL):
-            if retries > self._save_response_retries:
-                raise Exception(self.__class__.__name__, "Restore configuration failed with error: TFTP session timeout")
-
-            time.sleep(self._save_response_timeout)
-            output += self.cli_service.send_command(command="", expected_str=self._default_prompt)
-            retries += 1
-
-        output += self.cli_service.send_command(command="", expected_str=self._default_prompt)
+        output = self._buffer_readup(output=output)
 
         if re.search(r"[Dd]one", output, re.DOTALL):
             self.logger.debug("Reloading {} successfully".format(configuration_type))
             if _is_need_reload:
-                self.reload()
+                self.state_operations.reload()
             return 'Restore configuration completed.'
         else:
             matched = re.match(r"[Ee]rror.*", output, re.DOTALL)
@@ -161,3 +143,18 @@ class BrocadeFastIronConfigurationOperations(BrocadeConfigurationOperations):
             else:
                 error = "Error during copy configuration"
             raise Exception(self.__class__.__name__, "Restore configuration failed with error: {}".format(error))
+
+    def _buffer_readup(self, output):
+        """ Read buffer to end of command execution if prompt returned immediately """
+        retries = 1
+        while not re.search(r"[Dd]one|[Ee]rror|[Ff]ailed", output, re.DOTALL):
+            if retries > self._save_response_retries:
+                raise Exception(self.__class__.__name__, "Save configuration failed with error: TFTP session timeout")
+
+            time.sleep(self._save_response_timeout)
+            output += self.cli_service.send_command(command="", expected_str=self._default_prompt)
+            retries += 1
+
+        output += self.cli_service.send_command(command="", expected_str=self._default_prompt)
+
+        return output

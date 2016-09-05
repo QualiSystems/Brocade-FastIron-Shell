@@ -10,8 +10,7 @@ from cloudshell.networking.brocade.fastiron.fastiron_driver_bootstrap import Fas
 # from cloudshell.networking.brocade.ironware.handler.brocade_ironware_connectivity_operations import \
 #     BrocadeIronwareConnectivityOperations as ConnectivityOperations
 
-from cloudshell.networking.networking_resource_driver_interface_v4 import NetworkingResourceDriverInterface
-
+from cloudshell.networking.networking_resource_driver_interface import NetworkingResourceDriverInterface
 
 from cloudshell.shell.core.context_utils import ContextFromArgsMeta
 from cloudshell.shell.core.resource_driver_interface import ResourceDriverInterface
