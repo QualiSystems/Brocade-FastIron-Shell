@@ -12,8 +12,8 @@ class BrocadeFastIronFirmwareOperations(BrocadeFirmwareOperations):
     SAVE_RESPONSE_TIMEOUT = 3
     SAVE_RESPONSE_RETRIES = 10
 
-    def __init__(self, context=None, api=None, cli_service=None, logger=None, config=None):
-        BrocadeFirmwareOperations.__init__(self, context, api, cli_service, logger, config)
+    def __init__(self, context=None, api=None, cli_service=None, logger=None):
+        BrocadeFirmwareOperations.__init__(self, context, api, cli_service, logger)
         overridden_config = override_attributes_from_config(BrocadeFastIronFirmwareOperations)
         self._save_response_timeout = overridden_config.SAVE_RESPONSE_TIMEOUT
         self._save_response_retries = overridden_config.SAVE_RESPONSE_RETRIES
