@@ -12,7 +12,7 @@ ENABLE_PROMPT = r'#\s*$'
 CONFIG_MODE_PROMPT = r'config.*#\s*$'
 ENTER_CONFIG_MODE_PROMPT_COMMAND = 'configure terminal'
 EXIT_CONFIG_MODE_PROMPT_COMMAND = 'exit'
-SUPPORTED_OS = ["Brocade.+MLX.+IronWare"]
+SUPPORTED_OS = ["Brocade.+ICX.+IronWare"]
 HE_MAX_LOOP_RETRIES = 0
 
 
