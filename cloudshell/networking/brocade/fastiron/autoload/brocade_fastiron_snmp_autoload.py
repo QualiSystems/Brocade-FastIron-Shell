@@ -235,9 +235,11 @@ class FastIronSnmpAutoload(BrocadeSnmpAutoload):
                                                           int(module_id))
             if module_serial_number.startswith("0x"):
                 module_serial_number = module_serial_number[2:].decode("hex")
+            elif "no such object" in module_serial_number.lower():
+                module_serial_number = ""
 
             module_details_map = {'module_model': module.get("snAgentBrd2MainBrdDescription"),
-                                  'version': "Unknown",  # TODO
+                                  'version': "",  # TODO
                                   'serial_number': module_serial_number
                                   }
             module_name = 'Module {0}'.format(module_id)
@@ -256,6 +258,8 @@ class FastIronSnmpAutoload(BrocadeSnmpAutoload):
                               for key, value in
                               self.snmp.get_table("FOUNDRY-SN-SWITCH-GROUP-MIB", "snSwPortIfIndex").iteritems()}
 
+        ip_addr_table = {int(key.split(".")[0]): value for key, value in self.snmp.get_table("FOUNDRY-SN-IP-MIB", "snRtIpPortIfAddress").iteritems()}
+
         for port_id, port_name in self.snmp.get_table("IF-MIB", "ifName").iteritems():
             if not re.search(self.port_exclude_pattern, port_name.get("ifName", ""), re.IGNORECASE):
                 interface_name = self.snmp.get_property("IF-MIB", "ifName", int(port_id)).replace("/", "-")
@@ -272,7 +276,8 @@ class FastIronSnmpAutoload(BrocadeSnmpAutoload):
                                  "adjacent": self._get_adjacent(port_id),
                                  "duplex": self._get_duplex(port_index_mapping.get(port_id, -1)),
                                  "auto_negotiation": self._get_auto_negotiation(port_id),
-                                 "ipv4_address": self.snmp.get_property("FOUNDRY-SN-IP-MIB", " snRtIpPortIfAddress", int(port_id)),
+                                 # "ipv4_address": self.snmp.get_property("FOUNDRY-SN-IP-MIB", "snRtIpPortIfAddress", int(port_id)),
+                                 "ipv4_address": ip_addr_table.get(int(port_id), {}).get("snRtIpPortIfAddress") or "",
                                  "ipv6_address": ""  # TODO
                                  }
                 port_object = Port(name=interface_name, relative_path=relative_path, **attribute_map)
