@@ -1,6 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
+import os
 import re
 
 from cloudshell.networking.brocade.autoload.brocade_snmp_autoload import BrocadeSnmpAutoload
@@ -76,6 +77,8 @@ class FastIronSnmpAutoload(BrocadeSnmpAutoload):
         self.logger.info("Start SNMP discovery process .....")
 
         self.load_additional_mibs()
+        self.snmp.update_mib_sources(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "mibs")))
+
         self.snmp.load_mib(["FOUNDRY-SN-AGENT-MIB", "FOUNDRY-SN-SWITCH-GROUP-MIB", "FOUNDRY-SN-STACKING-MIB",
                             "FOUNDRY-SN-IP-MIB"])
 
