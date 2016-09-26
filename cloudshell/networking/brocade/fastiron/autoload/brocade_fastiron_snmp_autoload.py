@@ -258,8 +258,6 @@ class FastIronSnmpAutoload(BrocadeSnmpAutoload):
                               for key, value in
                               self.snmp.get_table("FOUNDRY-SN-SWITCH-GROUP-MIB", "snSwPortIfIndex").iteritems()}
 
-        ip_addr_table = {int(key.split(".")[0]): value for key, value in self.snmp.get_table("FOUNDRY-SN-IP-MIB", "snRtIpPortIfAddress").iteritems()}
-
         for port_id, port_name in self.snmp.get_table("IF-MIB", "ifName").iteritems():
             if not re.search(self.port_exclude_pattern, port_name.get("ifName", ""), re.IGNORECASE):
                 interface_name = self.snmp.get_property("IF-MIB", "ifName", int(port_id)).replace("/", "-")
@@ -276,10 +274,9 @@ class FastIronSnmpAutoload(BrocadeSnmpAutoload):
                                  "adjacent": self._get_adjacent(port_id),
                                  "duplex": self._get_duplex(port_index_mapping.get(port_id, -1)),
                                  "auto_negotiation": self._get_auto_negotiation(port_id),
-                                 # "ipv4_address": self.snmp.get_property("FOUNDRY-SN-IP-MIB", "snRtIpPortIfAddress", int(port_id)),
-                                 "ipv4_address": ip_addr_table.get(int(port_id), {}).get("snRtIpPortIfAddress") or "",
-                                 "ipv6_address": ""  # TODO
                                  }
+
+                attribute_map.update(self._get_ip_interface_details(int(port_id)))
                 port_object = Port(name=interface_name, relative_path=relative_path, **attribute_map)
                 self._add_resource(port_object)
                 self.logger.info("Added Interface '{}'".format(interface_name))
@@ -330,3 +327,23 @@ class FastIronSnmpAutoload(BrocadeSnmpAutoload):
         except Exception as e:
             self.logger.error('Failed to load auto negotiation property for interface {0}'.format(e.message))
         return "False"
+
+    def _get_ip_interface_details(self, port_index):
+        """Get IP address details for provided port
+
+        :param port_index: port index in ifTable
+        :return interface_details: detected info for provided interface dict{'IPv4 Address': '', 'IPv6 Address': ''}
+        """
+
+        interface_details = {'ipv4_address': '', 'ipv6_address': ''}
+        if self.ip_v4_table and len(self.ip_v4_table) > 1:
+            for key, value in self.ip_v4_table.iteritems():
+                if 'ipAdEntIfIndex' in value and int(value['ipAdEntIfIndex']) == port_index:
+                    interface_details['ipv4_address'] = key
+                break
+        if self.ip_v6_table and len(self.ip_v6_table) > 1:
+            for key, value in self.ip_v6_table.iteritems():
+                if 'ipAdEntIfIndex' in value and int(value['ipAdEntIfIndex']) == port_index:
+                    interface_details['ipv6_address'] = key
+                break
+        return interface_details
