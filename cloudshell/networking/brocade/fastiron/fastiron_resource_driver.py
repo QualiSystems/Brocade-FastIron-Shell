@@ -9,7 +9,7 @@ from cloudshell.networking.brocade.fastiron.handler.brocade_fastiron_firmware_op
 from cloudshell.networking.brocade.brocade_state_operations import BrocadeStateOperations as StateOperations
 from cloudshell.networking.brocade.brocade_send_command_operations import BrocadeSendCommandOperations as SendCommandOperations
 from cloudshell.networking.brocade.fastiron.handler.brocade_fastiron_configuration_operations import BrocadeFastIronConfigurationOperations as ConfigurationOperations
-from cloudshell.networking.brocade.brocade_connectivity_operations import BrocadeConnectivityOperations as ConnectivityOperations
+from cloudshell.networking.brocade.fastiron.handler.brocade_fastiron_connectivity_operations import BrocadeFastIronConnectivityOperations as ConnectivityOperations
 from cloudshell.networking.networking_resource_driver_interface import NetworkingResourceDriverInterface
 from cloudshell.shell.core.context_utils import ContextFromArgsMeta
 from cloudshell.shell.core.driver_bootstrap import DriverBootstrap as Bootstrap
@@ -67,7 +67,7 @@ class BrocadeFastIronResourceDriver(ResourceDriverInterface, NetworkingResourceD
                                                     .format(str(request)))
         response = self.__connectivity_operations.apply_connectivity_changes(request)
 
-        self.__connectivity_operations.logger.debug("Finished applying connectivity changes, responce is: {0}"
+        self.__connectivity_operations.logger.debug("Finished applying connectivity changes, response is: {0}"
                                                     .format(str(response)))
         return response
 
@@ -144,6 +144,7 @@ class BrocadeFastIronResourceDriver(ResourceDriverInterface, NetworkingResourceD
 
     def save(self, context, folder_path, configuration_type="running", vrf_management_name=None):
         """Save selected file to the provided destination
+
         :param configuration_type: source file, which will be saved
         :param folder_path: destination path where file will be saved
         :param vrf_management_name: VRF management Name
@@ -158,9 +159,9 @@ class BrocadeFastIronResourceDriver(ResourceDriverInterface, NetworkingResourceD
                                                     "{splitter}".format(splitter=SPLITTER,
                                                                         folder_path=folder_path,
                                                                         configuration_type=configuration_type))
-        return self.__configuration_operations.save(configuration_type, folder_path)
+        return self.__configuration_operations.save(folder_path=folder_path, configuration_type=configuration_type)
 
-    def restore(self, context, path, configuration_type='running', restore_method='override', vrf_management_name=None):
+    def restore(self, context, path, configuration_type="running", restore_method="override", vrf_management_name=None):
         """ Restore selected file to the provided destination
 
         :param path: source config file
