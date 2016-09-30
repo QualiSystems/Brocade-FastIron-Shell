@@ -23,6 +23,7 @@ class BrocadeFastIronConnectivityOperations(BrocadeConnectivityOperations):
         :param ctag: CTag details
         :return: success message or Exception
         """
+
         self.logger.info('VLANs Configuration Started')
         self.validate_vlan_methods_incoming_parameters(vlan_range, port, port_mode)
         if_name = self.get_port_name(port)
@@ -42,15 +43,21 @@ class BrocadeFastIronConnectivityOperations(BrocadeConnectivityOperations):
                     if start > end:
                         start, end = end, start
                     self.cli_service.send_config_command("vlan {start} to {end}".format(start=start, end=end))
+                    self.cli_service.send_config_command(command="{tag_type} {if_name}".format(tag_type=tag_type,
+                                                                                               if_name=if_name),
+                                                         expected_str=r"vlan\s*{0}|VLAN\s*{0}".format(end))
                 else:
                     raise Exception(self.__class__.__name__, "Wrong VLAN range declaration'{}'.".format(vlan))
             else:
                 if validateVlanNumber(vlan):
                     self.cli_service.send_config_command("vlan {}".format(vlan))
+                    self.cli_service.send_config_command(command="{tag_type} {if_name}".format(tag_type=tag_type,
+                                                                                               if_name=if_name),
+                                                         expected_str=r"vlan\s*{0}|VLAN\s*{0}".format(vlan))
                 else:
                     raise Exception(self.__class__.__name__, "Wrong VLAN number '{}'.".format(vlan))
 
-            self.cli_service.send_config_command("{tag_type} {if_name}".format(tag_type=tag_type, if_name=if_name))
+            self.cli_service.send_config_command("")
             self.cli_service.exit_configuration_mode()
 
             if qnq and self._does_interface_support_qnq(if_name):
@@ -87,15 +94,21 @@ class BrocadeFastIronConnectivityOperations(BrocadeConnectivityOperations):
                     if start > end:
                         start, end = end, start
                     self.cli_service.send_config_command("vlan {start} to {end}".format(start=start, end=end))
+                    self.cli_service.send_config_command(command="no {tag_type} {if_name}".format(tag_type=tag_type,
+                                                                                                  if_name=if_name),
+                                                         expected_str=r"vlan\s*{0}|VLAN\s*{0}".format(end))
                 else:
                     raise Exception(self.__class__.__name__, "Wrong VLAN range declaration'{}'.".format(vlan))
             else:
                 if validateVlanNumber(vlan):
                     self.cli_service.send_config_command("vlan {}".format(vlan))
+                    self.cli_service.send_config_command(command="no {tag_type} {if_name}".format(tag_type=tag_type,
+                                                                                                  if_name=if_name),
+                                                         expected_str=r"vlan\s*{0}|VLAN\s*{0}".format(vlan))
                 else:
                     raise Exception(self.__class__.__name__, "Wrong VLAN number '{}'.".format(vlan))
 
-            self.cli_service.send_config_command("no {tag_type} {if_name}".format(tag_type=tag_type, if_name=if_name))
+            self.cli_service.send_config_command("")
             self.cli_service.exit_configuration_mode()
 
         return "Remove Vlan Completed"
