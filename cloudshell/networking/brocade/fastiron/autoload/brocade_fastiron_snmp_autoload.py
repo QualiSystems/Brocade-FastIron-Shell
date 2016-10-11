@@ -9,7 +9,6 @@ from cloudshell.networking.autoload.networking_autoload_resource_attributes impo
 from cloudshell.networking.autoload.networking_autoload_resource_structure import Chassis, Module, PowerPort, Port, \
     PortChannel
 from cloudshell.shell.core.config_utils import override_attributes_from_config
-from cloudshell.shell.core.context_utils import get_attribute_by_name
 from cloudshell.shell.core.driver_context import AutoLoadDetails
 
 
@@ -26,13 +25,6 @@ class FastIronSnmpAutoload(BrocadeSnmpAutoload):
         """
 
         BrocadeSnmpAutoload.__init__(self,  snmp_handler, logger, config, cli_service, snmp_community)
-        self._config = config
-        self._snmp = snmp_handler
-        self._logger = logger
-        self.snmp_community = snmp_community
-        if not self.snmp_community:
-            self.snmp_community = get_attribute_by_name("SNMP Read Community") or "quali"
-        self._cli_service = cli_service
 
         self.port_exclude_pattern = r'serial|stack|engine|management|mgmt'
         self.relative_path = {}

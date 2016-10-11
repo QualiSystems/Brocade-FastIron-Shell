@@ -23,9 +23,9 @@ class BrocadeFastIronResourceDriver(ResourceDriverInterface, NetworkingResourceD
 
     def __init__(self, config=None, connectivity_operations=None, send_command_operations=None, autoload=None):
         super(BrocadeFastIronResourceDriver, self).__init__()
-        self._connectivity_operations = connectivity_operations
-        self._send_command_operations = send_command_operations
-        self._autoload = autoload
+        self.connectivity_operations = connectivity_operations
+        self.send_command_operations = send_command_operations
+        self.autoload = autoload
         bootstrap = Bootstrap()
         bootstrap.add_config(driver_config)
         if config:
@@ -33,27 +33,27 @@ class BrocadeFastIronResourceDriver(ResourceDriverInterface, NetworkingResourceD
         bootstrap.initialize()
 
     @property
-    def __firmware_operations(self):
+    def _firmware_operations(self):
         return FirmwareOperations()
 
     @property
-    def __autoload(self):
-        return self._autoload or Autoload()
+    def _autoload(self):
+        return self.autoload or Autoload()
 
     @property
-    def __send_command_operations(self):
-        return self._send_command_operations or SendCommandOperations()
+    def _send_command_operations(self):
+        return self.send_command_operations or SendCommandOperations()
 
     @property
-    def __configuration_operations(self):
+    def _configuration_operations(self):
         return ConfigurationOperations()
 
     @property
-    def __connectivity_operations(self):
-        return self._connectivity_operations or ConnectivityOperations()
+    def _connectivity_operations(self):
+        return self.connectivity_operations or ConnectivityOperations()
 
     @property
-    def __state_operations(self):
+    def _state_operations(self):
         return StateOperations()
 
     def initialize(self, context):
@@ -63,12 +63,12 @@ class BrocadeFastIronResourceDriver(ResourceDriverInterface, NetworkingResourceD
         pass
 
     def ApplyConnectivityChanges(self, context, request):
-        self.__connectivity_operations.logger.debug("Start applying connectivity changes, request is: {0}"
-                                                    .format(str(request)))
-        response = self.__connectivity_operations.apply_connectivity_changes(request)
+        self._connectivity_operations.logger.debug("Start applying connectivity changes, request is: {0}"
+                                                   .format(str(request)))
+        response = self._connectivity_operations.apply_connectivity_changes(request)
 
-        self.__connectivity_operations.logger.debug("Finished applying connectivity changes, response is: {0}"
-                                                    .format(str(response)))
+        self._connectivity_operations.logger.debug("Finished applying connectivity changes, response is: {0}"
+                                                   .format(str(response)))
         return response
 
     def get_inventory(self, context):
@@ -77,7 +77,7 @@ class BrocadeFastIronResourceDriver(ResourceDriverInterface, NetworkingResourceD
         :return: AutoLoadDetails object
         """
 
-        return self.__autoload.discover()
+        return self._autoload.discover()
 
     def run_custom_command(self, context, custom_command):
         """ Send custom command
@@ -86,10 +86,10 @@ class BrocadeFastIronResourceDriver(ResourceDriverInterface, NetworkingResourceD
         :return: command execution output
         """
 
-        self.__send_command_operations.logger.info("{splitter}\nRun method 'Send Custom Command' with parameters:\n"
-                                                   "command = {command}\n{splitter}".format(splitter=SPLITTER,
-                                                                                            command=custom_command))
-        return self.__send_command_operations.run_custom_command(custom_command)
+        self._send_command_operations.logger.info("{splitter}\nRun method 'Send Custom Command' with parameters:\n"
+                                                  "command = {command}\n{splitter}".format(splitter=SPLITTER,
+                                                                                           command=custom_command))
+        return self._send_command_operations.run_custom_command(custom_command)
 
     def run_custom_config_command(self, context, custom_command):
         """ Send custom command in configuration mode
@@ -98,10 +98,10 @@ class BrocadeFastIronResourceDriver(ResourceDriverInterface, NetworkingResourceD
         :return: command execution output
         """
 
-        self.__send_command_operations.logger.info("{splitter}\nRun method 'Send Custom Config Command' with parameters:"
-                                                   "\ncommand = {command}\n{splitter}".format(splitter=SPLITTER,
-                                                                                              command=custom_command))
-        return self.__send_command_operations.run_custom_config_command(custom_command)
+        self._send_command_operations.logger.info("{splitter}\nRun method 'Send Custom Config Command' with parameters:"
+                                                  "\ncommand = {command}\n{splitter}".format(splitter=SPLITTER,
+                                                                                             command=custom_command))
+        return self._send_command_operations.run_custom_config_command(custom_command)
 
     def send_custom_command(self, context, custom_command):
         """ Send custom command
@@ -110,10 +110,10 @@ class BrocadeFastIronResourceDriver(ResourceDriverInterface, NetworkingResourceD
         :return: command execution output
         """
 
-        self.__send_command_operations.logger.info("{splitter}\nRun method 'Send Custom Command' with parameters:\n"
-                                                   "command = {command}\n{splitter}".format(splitter=SPLITTER,
-                                                                                            command=custom_command))
-        return self.__send_command_operations.run_custom_command(custom_command)
+        self._send_command_operations.logger.info("{splitter}\nRun method 'Send Custom Command' with parameters:\n"
+                                                  "command = {command}\n{splitter}".format(splitter=SPLITTER,
+                                                                                           command=custom_command))
+        return self._send_command_operations.run_custom_command(custom_command)
 
     def send_custom_config_command(self, context, custom_command):
         """ Send custom command in configuration mode
@@ -122,10 +122,10 @@ class BrocadeFastIronResourceDriver(ResourceDriverInterface, NetworkingResourceD
         :return: command execution output
         """
 
-        self.__send_command_operations.logger.info("{splitter}\nRun method 'Send Custom Config Command' with parameters:"
-                                                   "\ncommand = {command}\n{splitter}".format(splitter=SPLITTER,
-                                                                                              command=custom_command))
-        return self.__send_command_operations.run_custom_config_command(custom_command)
+        self._send_command_operations.logger.info("{splitter}\nRun method 'Send Custom Config Command' with parameters:"
+                                                  "\ncommand = {command}\n{splitter}".format(splitter=SPLITTER,
+                                                                                             command=custom_command))
+        return self._send_command_operations.run_custom_config_command(custom_command)
 
     def load_firmware(self, context, path, vrf_management_name=None):
         """Upload and updates firmware on the resource
@@ -134,13 +134,13 @@ class BrocadeFastIronResourceDriver(ResourceDriverInterface, NetworkingResourceD
         :return: result
         """
 
-        self.__firmware_operations.logger.info("{splitter}\nRun method 'Load Firmware' with parameters:\n"
-                                               "path = {path},\n"
-                                               "vrf_management_name = {vrf_management_name}\n"
-                                               "{splitter}".format(splitter=SPLITTER,
-                                                                   path=path,
-                                                                   vrf_management_name=vrf_management_name))
-        return self.__firmware_operations.load_firmware(path, vrf_management_name)
+        self._firmware_operations.logger.info("{splitter}\nRun method 'Load Firmware' with parameters:\n"
+                                              "path = {path},\n"
+                                              "vrf_management_name = {vrf_management_name}\n"
+                                              "{splitter}".format(splitter=SPLITTER,
+                                                                  path=path,
+                                                                  vrf_management_name=vrf_management_name))
+        return self._firmware_operations.load_firmware(path, vrf_management_name)
 
     def save(self, context, folder_path, configuration_type="running", vrf_management_name=None):
         """Save selected file to the provided destination
@@ -153,13 +153,13 @@ class BrocadeFastIronResourceDriver(ResourceDriverInterface, NetworkingResourceD
 
         if not configuration_type:
             configuration_type = "running"
-        self.__configuration_operations.logger.info("{splitter}\nRun method 'Save' with parameters:\n"
-                                                    "configuration_type = {configuration_type},\n"
-                                                    "folder_path = {folder_path},\n"
-                                                    "{splitter}".format(splitter=SPLITTER,
-                                                                        folder_path=folder_path,
-                                                                        configuration_type=configuration_type))
-        return self.__configuration_operations.save(folder_path=folder_path, configuration_type=configuration_type)
+        self._configuration_operations.logger.info("{splitter}\nRun method 'Save' with parameters:\n"
+                                                   "configuration_type = {configuration_type},\n"
+                                                   "folder_path = {folder_path},\n"
+                                                   "{splitter}".format(splitter=SPLITTER,
+                                                                       folder_path=folder_path,
+                                                                       configuration_type=configuration_type))
+        return self._configuration_operations.save(folder_path=folder_path, configuration_type=configuration_type)
 
     def restore(self, context, path, configuration_type="running", restore_method="override", vrf_management_name=None):
         """ Restore selected file to the provided destination
@@ -176,39 +176,39 @@ class BrocadeFastIronResourceDriver(ResourceDriverInterface, NetworkingResourceD
         if not restore_method:
             restore_method = 'override'
 
-        self.__configuration_operations.logger.info("{splitter}\nRun method 'Restore' with parameters:"
-                                                    "path = {path},\n"
-                                                    "config_type = {config_type},\n"
-                                                    "restore_method = {restore_method}\n"
-                                                    "{splitter}".format(splitter=SPLITTER,
-                                                                        path=path,
-                                                                        config_type=configuration_type,
-                                                                        restore_method=restore_method))
-        return self.__configuration_operations.restore(path, configuration_type, restore_method)
+        self._configuration_operations.logger.info("{splitter}\nRun method 'Restore' with parameters:"
+                                                   "path = {path},\n"
+                                                   "config_type = {config_type},\n"
+                                                   "restore_method = {restore_method}\n"
+                                                   "{splitter}".format(splitter=SPLITTER,
+                                                                       path=path,
+                                                                       config_type=configuration_type,
+                                                                       restore_method=restore_method))
+        return self._configuration_operations.restore(path, configuration_type, restore_method)
 
     def orchestration_save(self, context, mode='shallow', custom_params=None):
 
         if not mode:
             mode = 'shallow'
 
-        self.__configuration_operations.logger.info("{splitter}\nOrchestration save started".format(splitter=SPLITTER))
+        self._configuration_operations.logger.info("{splitter}\nOrchestration save started".format(splitter=SPLITTER))
 
-        response = self.__configuration_operations.orchestration_save(mode=mode, custom_params=custom_params)
-        self.__configuration_operations.logger.info("Orchestration save completed\n{splitter}".format(splitter=SPLITTER))
+        response = self._configuration_operations.orchestration_save(mode=mode, custom_params=custom_params)
+        self._configuration_operations.logger.info("Orchestration save completed\n{splitter}".format(splitter=SPLITTER))
         return response
 
     def orchestration_restore(self, context, saved_artifact_info, custom_params=None):
-        self.__configuration_operations.logger.info("{splitter}\nOrchestration restore started".format(splitter=SPLITTER))
-        self.__configuration_operations.orchestration_restore(saved_artifact_info=saved_artifact_info,
-                                                              custom_params=custom_params)
+        self._configuration_operations.logger.info("{splitter}\nOrchestration restore started".format(splitter=SPLITTER))
+        self._configuration_operations.orchestration_restore(saved_artifact_info=saved_artifact_info,
+                                                             custom_params=custom_params)
 
-        self.__configuration_operations.logger.info("Orchestration restore completed\n{splitter}".format(splitter=SPLITTER))
+        self._configuration_operations.logger.info("Orchestration restore completed\n{splitter}".format(splitter=SPLITTER))
 
     def health_check(self, context):
         """ Performs device health check """
 
-        return self.__state_operations.health_check()
+        return self._state_operations.health_check()
 
     def shutdown(self, context):
         """ Shutdown device """
-        self.__state_operations.shutdown()
+        self._state_operations.shutdown()
