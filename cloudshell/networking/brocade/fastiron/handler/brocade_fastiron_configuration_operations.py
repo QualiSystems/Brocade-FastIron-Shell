@@ -56,7 +56,7 @@ class BrocadeFastIronConfigurationOperations(BrocadeConfigurationOperations):
         output = self._buffer_readup(output=output)
 
         if re.search(r"[Dd]one", output, re.DOTALL):
-            return "{0}".format(file_path)
+            return "{0}".format(file_name)
         else:
             matched = re.match(r"(Error.*)\n", output, re.DOTALL)
             if matched:
