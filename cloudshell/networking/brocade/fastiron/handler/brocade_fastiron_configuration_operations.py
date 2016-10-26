@@ -65,13 +65,13 @@ class BrocadeFastIronConfigurationOperations(BrocadeConfigurationOperations):
                 error = "Error during copy configuration"
             raise Exception(self.__class__.__name__, "Save configuration failed with error: {}".format(error))
 
-    def restore(self, path, configuration_type, restore_method='override', vrf=None):
+    def restore(self, path, configuration_type, restore_method='override', vrf_management_name=None):
         """ Restore configuration on device from remote server
 
         :param path: Full path to configuration file on remote server
         :param configuration_type: Type of configuration to restore. supports running and startup configuration
         :param restore_method: Type of restore method. Supports append and override. By default is override
-        :param vrf: Not supported for Brocade Devices
+        :param vrf_management_name: Not supported for Brocade Devices
 
         :return Successful message or Exception
         """
